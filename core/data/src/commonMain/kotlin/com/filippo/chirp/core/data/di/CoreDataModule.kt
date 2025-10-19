@@ -1,0 +1,30 @@
+package com.filippo.chirp.core.data.di
+
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.filippo.chirp.core.data.networking.HttpClientFactory
+import jakarta.inject.Singleton
+import kotlinx.serialization.json.Json
+import okio.Path.Companion.toPath
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Named
+
+@Module
+@Configuration
+@ComponentScan("com.filippo.chirp.core.data")
+class CoreDataModule {
+
+    @Singleton
+    fun json() = Json {
+        ignoreUnknownKeys = true
+    }
+
+    @Singleton
+    fun sessionDatastore(
+        @Named(DATASTORE_FILE_NAME) path: String,
+    ) = PreferenceDataStoreFactory.createWithPath { path.toPath() }
+
+    @Singleton
+    fun httpClient(httpClientFactory: HttpClientFactory) = httpClientFactory.create()
+}
