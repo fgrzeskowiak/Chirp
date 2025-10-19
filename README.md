@@ -1,5 +1,5 @@
 ## Chirp
-This is a WIP Kotlin Multiplatform project, meant to be a real-time chat application, with a complete account management flow. It targets Android, iOS, and Desktop (in the future).  
+This is a WIP Kotlin Multiplatform project, meant to be a real-time chat application, with a complete account management flow. It connects to a [dedicated backend service](https://github.com/fgrzeskowiak/chirp-backend) and targets Android, iOS, and Desktop (in the future).  
 It uses a multi-module architecture with separate `data`, `domain` and `presentation` modules with additional separation into `core` and `feature` modules. This allows to follow Clean Architecture principles on a module level.  
 The structure looks as follows:
 
@@ -22,9 +22,9 @@ The project is being created as a part of a [Kotlin Full-Stack course](https://p
 * Extracting some logic from ViewModels to UseCases, where it was more business-related logic than presentation logic
 * Improving readability of some Convention Plugins
 
-Currently implemented features:
+### Currently implemented features:
 * registration
 * login
-* email verification deeplinking
+* email verification deeplinking (however the email sending is not yet implemented on BE side)
 
 In order to build the project, a Chirp production `API_KEY` must be placed inside `local.properties` file.
