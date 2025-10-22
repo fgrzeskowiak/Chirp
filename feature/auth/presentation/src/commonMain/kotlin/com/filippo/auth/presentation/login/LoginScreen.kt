@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,7 +26,7 @@ import com.filippo.core.designsystem.components.brand.ChirpBrandLogo
 import com.filippo.core.designsystem.components.buttons.ChirpButton
 import com.filippo.core.designsystem.components.buttons.ChirpButtonStyle
 import com.filippo.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
-import com.filippo.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.filippo.core.designsystem.components.layouts.ChirpScaffold
 import com.filippo.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.filippo.core.designsystem.components.textfields.ChirpTextField
 import com.filippo.core.designsystem.theme.ChirpTheme
@@ -43,11 +41,9 @@ fun LoginRoot(
     onForgotPasswordClick: () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarState = remember { SnackbarHostState() }
 
     LoginScreen(
         state = state,
-        snackbarState = snackbarState,
         onLoginClick = viewModel::login,
         onForgotPasswordClick = onForgotPasswordClick,
         onCreateAccountClick = onCreateAccountClick,
@@ -57,12 +53,11 @@ fun LoginRoot(
 @Composable
 private fun LoginScreen(
     state: LoginState,
-    snackbarState: SnackbarHostState,
     onLoginClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onCreateAccountClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold(snackbarState) {
+    ChirpScaffold {
         ChirpAdaptiveFormLayout(
             modifier = Modifier.fillMaxSize(),
             headerText = stringResource(Res.string.welcome_back),
@@ -117,7 +112,6 @@ private fun LightPreview() {
     ChirpTheme {
         LoginScreen(
             state = LoginState(),
-            snackbarState = remember { SnackbarHostState() },
             onLoginClick = {},
             onForgotPasswordClick = {},
             onCreateAccountClick = {},
@@ -131,7 +125,6 @@ private fun DarkPreview() {
     ChirpTheme(darkTheme = true) {
         LoginScreen(
             state = LoginState(),
-            snackbarState = remember { SnackbarHostState() },
             onLoginClick = {},
             onForgotPasswordClick = {},
             onCreateAccountClick = {},

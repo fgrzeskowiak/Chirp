@@ -21,6 +21,7 @@ import chirp.feature.auth.presentation.generated.resources.submit
 import com.filippo.core.designsystem.components.brand.ChirpBrandLogo
 import com.filippo.core.designsystem.components.buttons.ChirpButton
 import com.filippo.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
+import com.filippo.core.designsystem.components.layouts.ChirpScaffold
 import com.filippo.core.designsystem.components.textfields.ChirpTextField
 import com.filippo.core.designsystem.theme.ChirpTheme
 import com.filippo.core.designsystem.theme.extended
@@ -45,37 +46,39 @@ internal fun ForgotPasswordScreen(
     state: ForgotPasswordState,
     onSubmitClick: () -> Unit,
 ) {
-    ChirpAdaptiveFormLayout(
-        headerText = stringResource(Res.string.forgot_password),
-        errorText = state.requestError?.asString(),
-        logo = { ChirpBrandLogo() },
-    ) {
-        ChirpTextField(
-            modifier = Modifier.fillMaxWidth(),
-            state = state.email,
-            placeholder = stringResource(Res.string.email_placeholder),
-            title = stringResource(Res.string.email),
-            hasError = state.validationError != null,
-            supportingText = state.validationError?.asString(),
-            keyboardType = KeyboardType.Email,
-            singleLine = true,
-        )
-        Spacer(Modifier.height(16.dp))
-        ChirpButton(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(Res.string.submit),
-            onClick = onSubmitClick,
-            isEnabled = state.canSubmit,
-        )
-        Spacer(Modifier.height(16.dp))
-        if (state.isSuccess) {
-            Text(
+    ChirpScaffold {
+        ChirpAdaptiveFormLayout(
+            headerText = stringResource(Res.string.forgot_password),
+            errorText = state.requestError?.asString(),
+            logo = { ChirpBrandLogo() },
+        ) {
+            ChirpTextField(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(Res.string.forgot_password_email_sent_successfully),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.extended.success,
-                textAlign = TextAlign.Center,
+                state = state.email,
+                placeholder = stringResource(Res.string.email_placeholder),
+                title = stringResource(Res.string.email),
+                hasError = state.validationError != null,
+                supportingText = state.validationError?.asString(),
+                keyboardType = KeyboardType.Email,
+                singleLine = true,
             )
+            Spacer(Modifier.height(16.dp))
+            ChirpButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.submit),
+                onClick = onSubmitClick,
+                isEnabled = state.canSubmit,
+            )
+            Spacer(Modifier.height(16.dp))
+            if (state.isSuccess) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(Res.string.forgot_password_email_sent_successfully),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.extended.success,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +41,6 @@ fun ChirpAdaptiveFormLayout(
     logo: @Composable () -> Unit = { ChirpBrandLogo() },
     formContent: @Composable ColumnScope.() -> Unit,
 ) {
-    LinearProgressIndicator()
     val configuration = currentDeviceConfiguration()
     val headerColor = if (configuration == DeviceConfiguration.MOBILE_LANDSCAPE) {
         MaterialTheme.colorScheme.onBackground

@@ -3,10 +3,8 @@ package com.filippo.auth.presentation.register
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,7 +24,7 @@ import chirp.feature.auth.presentation.generated.resources.welcome_to_chirp
 import com.filippo.core.designsystem.components.buttons.ChirpButton
 import com.filippo.core.designsystem.components.buttons.ChirpButtonStyle
 import com.filippo.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
-import com.filippo.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.filippo.core.designsystem.components.layouts.ChirpScaffold
 import com.filippo.core.designsystem.components.textfields.ChirpPasswordTextField
 import com.filippo.core.designsystem.components.textfields.ChirpTextField
 import com.filippo.core.designsystem.theme.ChirpTheme
@@ -42,7 +40,6 @@ fun RegisterRoot(
     onLoginClick: () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarState = remember { SnackbarHostState() }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -52,7 +49,6 @@ fun RegisterRoot(
 
     RegisterScreen(
         state = state,
-        snackbarState = snackbarState,
         onInputFocusChanged = { viewModel.onAction(RegisterAction.OnInputFocusChanged) },
         onRegisterClick = { viewModel.onAction(RegisterAction.OnRegisterClick) },
         onLoginClick = onLoginClick,
@@ -62,14 +58,11 @@ fun RegisterRoot(
 @Composable
 internal fun RegisterScreen(
     state: RegisterState,
-    snackbarState: SnackbarHostState,
     onInputFocusChanged: (Boolean) -> Unit,
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold(
-        snackbarState = snackbarState
-    ) {
+    ChirpScaffold {
         ChirpAdaptiveFormLayout(
             headerText = stringResource(Res.string.welcome_to_chirp),
             errorText = state.registrationError?.asString(),
@@ -136,7 +129,6 @@ private fun Preview() {
     ChirpTheme {
         RegisterScreen(
             state = RegisterState(),
-            snackbarState = remember { SnackbarHostState() },
             onInputFocusChanged = {},
             onRegisterClick = {},
             onLoginClick = {},

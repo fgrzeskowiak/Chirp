@@ -4,8 +4,9 @@ import arrow.core.raise.either
 import com.filippo.auth.domain.AuthError
 import com.filippo.auth.domain.validation.EmailValidator
 import com.filippo.core.domain.auth.AuthRepository
+import jakarta.inject.Inject
 
-class ForgotPasswordUseCase(
+class ForgotPasswordUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(email: String) = either {

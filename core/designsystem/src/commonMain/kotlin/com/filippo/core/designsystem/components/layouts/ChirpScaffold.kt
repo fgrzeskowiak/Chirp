@@ -8,29 +8,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
-fun ChirpSnackbarScaffold(
-    snackbarState: SnackbarHostState,
+fun ChirpScaffold(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    snackbarHost: @Composable () -> Unit = {},
+    content: @Composable () -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets.statusBars
             .union(WindowInsets.displayCutout)
             .union(WindowInsets.ime),
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarState,
-                modifier = Modifier.padding(bottom = 24.dp),
-            )
-        }
+        snackbarHost = snackbarHost,
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             content()

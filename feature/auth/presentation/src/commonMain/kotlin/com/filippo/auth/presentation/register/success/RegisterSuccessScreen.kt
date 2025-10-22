@@ -1,11 +1,14 @@
 package com.filippo.auth.presentation.register.success
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import chirp.feature.auth.presentation.generated.resources.Res
 import chirp.feature.auth.presentation.generated.resources.account_successfully_created
@@ -18,7 +21,7 @@ import com.filippo.core.designsystem.components.buttons.ChirpButton
 import com.filippo.core.designsystem.components.buttons.ChirpButtonStyle
 import com.filippo.core.designsystem.components.layouts.ChirpAdaptiveResultLayout
 import com.filippo.core.designsystem.components.layouts.ChirpSimpleResultLayout
-import com.filippo.core.designsystem.components.layouts.ChirpSnackbarScaffold
+import com.filippo.core.designsystem.components.layouts.ChirpScaffold
 import com.filippo.core.designsystem.theme.ChirpTheme
 import com.filippo.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.getString
@@ -57,7 +60,14 @@ internal fun RegisterSuccessScreen(
     onLoginClick: () -> Unit,
     onResendEmailClick: () -> Unit,
 ) {
-    ChirpSnackbarScaffold(snackbarState) {
+    ChirpScaffold(
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier.padding(bottom = 24.dp),
+                hostState = snackbarState
+            )
+        }
+    ) {
         ChirpAdaptiveResultLayout {
             ChirpSimpleResultLayout(
                 title = stringResource(Res.string.account_successfully_created),
