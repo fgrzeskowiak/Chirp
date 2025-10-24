@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.filippo.chat.presentation.chat_list.ChatListRoot
+import com.filippo.chat.presentation.chat_list_details.ChatListDetailsScreenRoot
 
 fun NavGraphBuilder.chatGraph(
     navController: NavController,
@@ -13,7 +13,11 @@ fun NavGraphBuilder.chatGraph(
         startDestination = ChatGraphRoutes.ChatList,
     ) {
         composable<ChatGraphRoutes.ChatList> {
-            ChatListRoot()
+            ChatListDetailsScreenRoot(
+                onLogout = {
+
+                }
+            )
         }
     }
 }

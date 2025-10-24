@@ -11,15 +11,18 @@ sealed interface UiText {
         val id: StringResource,
         val args: Array<Any> = emptyArray(),
     ) : UiText
+    data class Combined(var args: List<UiText>): UiText
 
     @Composable
     fun asString(): String = when (this) {
         is Dynamic -> value
         is Resource -> stringResource(id, *args)
+        is Combined -> args.map { it.asString() }.joinToString()
     }
 
     suspend fun asStringAsync(): String = when (this) {
         is Dynamic -> value
         is Resource -> getString(id)
+        is Combined -> args.map { it.asStringAsync() }.joinToString()
     }
 }

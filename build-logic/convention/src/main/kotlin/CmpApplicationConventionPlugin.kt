@@ -1,7 +1,6 @@
 import com.filippo.chirp.convention.configureAndroidTarget
 import com.filippo.chirp.convention.configureIosTarget
 import com.filippo.chirp.convention.libs
-import com.google.devtools.ksp.gradle.KspAATask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -49,12 +48,10 @@ class CmpApplicationConventionPlugin : Plugin<Project> {
             add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
         }
 
-        tasks.withType<KotlinCompilationTask<*>> {
+        tasks.withType<KotlinCompilationTask<*>>().configureEach {
             if (name != "kspCommonMainKotlinMetadata") {
                 dependsOn("kspCommonMainKotlinMetadata")
             }
         }
-
-        Unit
     }
 }

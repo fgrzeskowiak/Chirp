@@ -18,5 +18,4 @@ fun NavigationRoot(
         authGraph(navController)
         chatGraph(navController)
     }
-
 }

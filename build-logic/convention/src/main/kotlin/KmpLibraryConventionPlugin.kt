@@ -66,12 +66,10 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             }
         }
 
-        tasks.withType<KotlinCompilationTask<*>> {
+        tasks.withType<KotlinCompilationTask<*>>().configureEach {
             if (name != "kspCommonMainKotlinMetadata") {
                 dependsOn("kspCommonMainKotlinMetadata")
             }
         }
-
-        Unit
     }
 }
