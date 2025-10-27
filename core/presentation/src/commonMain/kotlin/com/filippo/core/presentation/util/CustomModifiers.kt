@@ -5,7 +5,7 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -21,12 +21,13 @@ fun Modifier.clearFocusOnTap(): Modifier = composed {
     }
 }
 
-fun Modifier.drawDivider(color: Color) = drawBehind {
+fun Modifier.drawDivider(color: Color) = drawWithContent {
+    drawContent()
     val strokeWidth = DividerDefaults.Thickness.toPx()
     drawLine(
         color = color,
-        start = Offset(0f, size.height),
-        end = Offset(size.width, size.height),
+        start = Offset(0f, size.height - strokeWidth / 2),
+        end = Offset(size.width, size.height - strokeWidth / 2),
         strokeWidth = strokeWidth,
     )
 }

@@ -1,11 +1,8 @@
 package com.filippo.chat.data.mappers
 
 import com.filippo.chat.data.model.ChatParticipantResponse
-import com.filippo.chat.data.model.ChatResponse
-import com.filippo.chat.domain.models.Chat
-import com.filippo.chat.domain.models.ChatMessage
+import com.filippo.chat.database.model.ChatParticipantEntity
 import com.filippo.chat.domain.models.ChatParticipant
-import kotlin.time.Instant
 
 fun ChatParticipantResponse.toDomain() = ChatParticipant(
     userId = userId,
@@ -13,17 +10,14 @@ fun ChatParticipantResponse.toDomain() = ChatParticipant(
     profilePictureUrl = profilePictureUrl,
 )
 
-fun ChatResponse.toDomain() = Chat(
-    id = id,
-    participants = participants.map { it.toDomain() },
-    lastActivityAt = Instant.parse(lastActivityAt),
-    lastMessage = lastMessage?.toDomain(),
+fun ChatParticipantEntity.toDomain() = ChatParticipant(
+    userId = id,
+    username = username,
+    profilePictureUrl = profilePictureUrl,
 )
 
-fun ChatResponse.Message.toDomain() = ChatMessage(
-    id = id,
-    chatId = chatId,
-    content = content,
-    createdAt = Instant.parse(createdAt),
-    senderId = senderId,
+fun ChatParticipant.toEntity() = ChatParticipantEntity(
+    id = userId,
+    username = username,
+    profilePictureUrl = profilePictureUrl
 )

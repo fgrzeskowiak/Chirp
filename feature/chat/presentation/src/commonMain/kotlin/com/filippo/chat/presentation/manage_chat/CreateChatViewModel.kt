@@ -1,4 +1,4 @@
-package com.filippo.chat.presentation.create_chat
+package com.filippo.chat.presentation.manage_chat
 
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
@@ -8,7 +8,6 @@ import chirp.feature.chat.presentation.generated.resources.Res
 import chirp.feature.chat.presentation.generated.resources.error_participant_not_found
 import com.filippo.chat.domain.ChatParticipantsRepository
 import com.filippo.chat.domain.ChatRepository
-import com.filippo.chat.domain.models.Chat
 import com.filippo.chat.presentation.mappers.toUiModel
 import com.filippo.core.domain.DataError
 import com.filippo.core.presentation.util.UiText
@@ -34,11 +33,11 @@ class CreateChatViewModel(
     private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
-    private val state = MutableStateFlow(CreateChatState())
-    val uiState: StateFlow<CreateChatState> = state
+    private val state = MutableStateFlow(ManageChatState())
+    val uiState: StateFlow<ManageChatState> = state
 
-    private val chatCreatedTrigger = Channel<Chat>()
-    val chatCreated: Flow<Chat> = chatCreatedTrigger.receiveAsFlow()
+    private val chatCreatedTrigger = Channel<String>()
+    val chatCreated: Flow<String> = chatCreatedTrigger.receiveAsFlow()
 
     init {
         snapshotFlow { state.value.query.text.toString() }
@@ -47,21 +46,14 @@ class CreateChatViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun onAction(action: CreateChatAction) {
-        when (action) {
-            CreateChatAction.OnAddClick -> addParticipant()
-            CreateChatAction.OnCreateChatClick -> createChat()
-        }
-    }
-
-    private fun addParticipant() = with(state.value) {
+    fun onAddParticipantClick() = with(state.value) {
         searchResult?.let { result ->
-            val isAlreadyInChat = participants.any { it.id == result.id }
+            val isAlreadyInChat = selectedParticipants.any { it.id == result.id }
             if (!isAlreadyInChat) {
                 state.update {
                     it.query.clearText()
                     it.copy(
-                        participants = participants + result,
+                        selectedParticipants = selectedParticipants + result,
                         canAddParticipant = false,
                         searchResult = null
                     )
@@ -70,8 +62,8 @@ class CreateChatViewModel(
         }
     }
 
-    private fun createChat() {
-        val userIds = state.value.participants.map { it.id }
+    fun onCreateChatClick() {
+        val userIds = state.value.selectedParticipants.map { it.id }
         if (userIds.isEmpty()) return
 
         viewModelScope.launch {
@@ -98,7 +90,7 @@ class CreateChatViewModel(
                                 isCreatingChat = false,
                             )
                         }
-                        chatCreatedTrigger.send(chat)
+                        chatCreatedTrigger.send(chat.id)
                     },
                 )
         }
@@ -124,7 +116,7 @@ class CreateChatViewModel(
                 )
             }
 
-            participantsRepository.searchParticipant(query)
+            participantsRepository.search(query)
                 .fold(
                     ifLeft = { error ->
                         val errorMessage = when (error) {

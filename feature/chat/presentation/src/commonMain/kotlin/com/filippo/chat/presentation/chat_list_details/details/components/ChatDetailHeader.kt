@@ -48,7 +48,6 @@ import chirp.core.designsystem.generated.resources.Res as DesignSystemRes
 fun ChatDetailHeader(
     chat: ChatUiModel?,
     showBackButton: Boolean,
-    onChatOptionsClick: () -> Unit,
     onManageChatClick: () -> Unit,
     onLeaveChatClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -86,7 +85,9 @@ fun ChatDetailHeader(
         }
 
         Box {
-            ChirpIconButton(onChatOptionsClick) {
+            var isMenuOpen by remember { mutableStateOf(false) }
+
+            ChirpIconButton(onClick = { isMenuOpen = true }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = stringResource(Res.string.open_chat_options_menu),
@@ -94,8 +95,6 @@ fun ChatDetailHeader(
                     tint = MaterialTheme.colorScheme.extended.textSecondary
                 )
             }
-
-            var isMenuOpen by remember { mutableStateOf(false) }
 
             ChirpDropdownMenu(
                 isOpen = isMenuOpen,
@@ -130,10 +129,10 @@ private fun Preview() {
                 title = UiText.Dynamic("Group Chat"),
                 subtitle = UiText.Dynamic("Bolek i Lolek"),
                 avatars = listOf(AvatarUiModel("BO"), AvatarUiModel("LO")),
+                remainingAvatars = 0,
                 lastMessage = AnnotatedString("Last message"),
             ),
             showBackButton = true,
-            onChatOptionsClick = {},
             onManageChatClick = {},
             onLeaveChatClick = {},
             onBackClick = {},

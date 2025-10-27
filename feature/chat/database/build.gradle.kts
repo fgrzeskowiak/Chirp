@@ -3,10 +3,6 @@ plugins {
     alias(libs.plugins.convention.room)
 }
 
-room {
-    this.generateKotlin
-}
-
 kotlin {
     // Source set declarations.
     // Declaring a target automatically creates a source set with the same name. By default, the

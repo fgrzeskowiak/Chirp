@@ -9,5 +9,6 @@ data class ChatUiModel(
     val title: UiText,
     val subtitle: UiText?,
     val avatars: List<AvatarUiModel>,
+    val remainingAvatars: Int,
     val lastMessage: AnnotatedString?,
 )

@@ -13,6 +13,7 @@ data class ChatListState(
             title = UiText.Dynamic("Group Chat"),
             subtitle = UiText.Dynamic("You, Bolek, Lolek"),
             avatars = listOf(AvatarUiModel("BO"), AvatarUiModel("LO")),
+            remainingAvatars = 1,
             lastMessage = AnnotatedString(
                 "This is a last chat message that was sent by Philipp " +
                         "and goes over multiple lines to showcase the ellipsis"
@@ -23,6 +24,7 @@ data class ChatListState(
             title = UiText.Dynamic("Tom"),
             subtitle = UiText.Dynamic("You, Tom"),
             avatars = listOf(AvatarUiModel("TO")),
+            remainingAvatars = 0,
             lastMessage = AnnotatedString(
                 "This is a last chat message that was sent by Philipp " +
                         "and goes over multiple lines to showcase the ellipsis"
@@ -35,5 +37,5 @@ data class ChatListState(
         username = "Tom",
         avatar = AvatarUiModel(displayText = "TO")
     ),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
 )

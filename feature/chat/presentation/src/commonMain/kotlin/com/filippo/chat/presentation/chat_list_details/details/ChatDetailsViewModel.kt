@@ -1,111 +1,89 @@
 package com.filippo.chat.presentation.chat_list_details.details
 
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.foundation.text.input.clearText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.filippo.chat.domain.models.MessageDeliveryStatus
-import com.filippo.chat.presentation.chat_list_details.model.ChatParticipantUiModel
-import com.filippo.chat.presentation.chat_list_details.model.ChatUiModel
-import com.filippo.chat.presentation.chat_list_details.model.MessageUiModel
-import com.filippo.core.designsystem.components.avatar.AvatarUiModel
-import com.filippo.core.presentation.util.UiText
-import kotlinx.coroutines.delay
+import com.filippo.chat.domain.ChatRepository
+import com.filippo.chat.presentation.mappers.toUiModel
+import com.filippo.core.domain.auth.SessionStorage
+import com.filippo.core.presentation.util.toUiText
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
-class ChatDetailsViewModel : ViewModel() {
+@OptIn(ExperimentalCoroutinesApi::class)
+class ChatDetailsViewModel(
+    private val repository: ChatRepository,
+    sessionStorage: SessionStorage,
+) : ViewModel() {
 
     private val state = MutableStateFlow(ChatDetailsState())
-    val uiState: StateFlow<ChatDetailsState> = state
+    private val currentChatId = MutableStateFlow<String?>(null)
 
-    private val chats = listOf(
-        ChatUiModel(
-            id = "1",
-            title = UiText.Dynamic("Group Chat"),
-            subtitle = UiText.Dynamic("You, Bolek, Lolek"),
-            avatars = listOf(AvatarUiModel("BO"), AvatarUiModel("LO")),
-            lastMessage = AnnotatedString(
-                "This is a last chat message that was sent by Philipp " +
-                        "and goes over multiple lines to showcase the ellipsis"
-            ),
-        ),
-        ChatUiModel(
-            id = "2",
-            title = UiText.Dynamic("Tom"),
-            subtitle = UiText.Dynamic("You, Tom"),
-            avatars = listOf(AvatarUiModel("TO")),
-            lastMessage = AnnotatedString(
-                "This is a last chat message that was sent by Philipp " +
-                        "and goes over multiple lines to showcase the ellipsis"
-            ),
-        )
-    )
+    private val events = Channel<ChatDetailsEvent>()
+    val uiEvents = events.receiveAsFlow()
 
-    private val messages = mapOf(
-        "1" to List(20) {
-            if (it % 2 == 0) {
-                MessageUiModel.LocalUserMessage(
-                    id = it.toString(),
-                    content = "Hello world!",
-                    deliveryStatus = MessageDeliveryStatus.SENT,
-                    formattedSentTime = UiText.Dynamic("Friday, Aug 20")
-                )
+    private val chatDetails = currentChatId
+        .flatMapLatest { chatId ->
+            if (chatId != null) {
+                fetchChat(chatId)
+                repository.getChatDetails(chatId)
             } else {
-                MessageUiModel.OtherUserMessage(
-                    id = it.toString(),
-                    content = "Hello world!",
-                    sender = ChatParticipantUiModel(
-                        id = "1",
-                        username = "Bolek",
-                        avatar = AvatarUiModel("BO")
-                    ),
-                    formattedSentTime = UiText.Dynamic("Friday, Aug 20"),
-                )
-            }
-        },
-        "2" to List(2) {
-            if (it % 2 == 0) {
-                MessageUiModel.LocalUserMessage(
-                    id = it.toString(),
-                    content = "Hello world!",
-                    deliveryStatus = MessageDeliveryStatus.SENT,
-                    formattedSentTime = UiText.Dynamic("Friday, Aug 20")
-                )
-            } else {
-                MessageUiModel.OtherUserMessage(
-                    id = it.toString(),
-                    content = "Hello world!",
-                    sender = ChatParticipantUiModel(
-                        id = "1",
-                        username = "Bolek",
-                        avatar = AvatarUiModel("BO")
-                    ),
-                    formattedSentTime = UiText.Dynamic("Friday, Aug 20"),
-                )
+                flowOf(null)
             }
         }
-    )
+
+    val uiState = combine(
+        state,
+        chatDetails,
+        sessionStorage.session.mapNotNull { it?.user },
+    ) { currentState, chatDetails, user ->
+        currentState.copy(
+            chat = chatDetails?.chat?.toUiModel(user.id),
+            messages = emptyList(),
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, ChatDetailsState())
 
     fun onAction(action: ChatDetailsAction) {
         when (action) {
+            is ChatDetailsAction.OnLeaveChatClick -> onLeaveChatClick()
             else -> Unit
         }
     }
 
-    fun onChatSelected(chatId: String?) {
+    private fun onLeaveChatClick() {
+        val chatId = currentChatId.value ?: return
+
         viewModelScope.launch {
-            state.update { it.copy(isLoading = true) }
-            delay(500)
-            state.update {
-                it.copy(
-                    chat = chats.find { chat -> chat.id == chatId },
-                    messages = messages[chatId].orEmpty()
+            repository.leaveChat(chatId)
+                .fold(
+                    ifLeft = { events.send(ChatDetailsEvent.OnError(it.toUiText())) },
+                    ifRight = {
+                        this@ChatDetailsViewModel.currentChatId.value = null
+                        state.value.messageInput.clearText()
+                        events.send(ChatDetailsEvent.OnChatLeft)
+                    }
                 )
-            }
+        }
+    }
+
+    fun onChatSelected(chatId: String?) {
+        this.currentChatId.value = chatId
+    }
+
+    private fun fetchChat(chatId: String) {
+        viewModelScope.launch {
+            repository.fetchChat(chatId)
         }
     }
 }

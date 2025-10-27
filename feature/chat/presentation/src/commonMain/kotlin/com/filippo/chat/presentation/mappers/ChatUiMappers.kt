@@ -8,46 +8,39 @@ import chirp.feature.chat.presentation.generated.resources.Res
 import chirp.feature.chat.presentation.generated.resources.group_chat
 import chirp.feature.chat.presentation.generated.resources.you
 import com.filippo.chat.domain.models.Chat
-import com.filippo.chat.domain.models.ChatParticipant
-import com.filippo.chat.presentation.chat_list_details.model.ChatParticipantUiModel
 import com.filippo.chat.presentation.chat_list_details.model.ChatUiModel
 import com.filippo.core.designsystem.components.avatar.AvatarUiModel
 import com.filippo.core.presentation.util.UiText
 
-fun ChatParticipant.toUiModel() = ChatParticipantUiModel(
-    id = userId,
-    username = username,
-    avatar = AvatarUiModel(displayText = initials, imageUrl = profilePictureUrl),
-)
-
 fun Chat.toUiModel(userId: String): ChatUiModel {
-    val (user, others) = participants.partition { it.userId == userId }
+    val otherParticipants = participants.filter { it.userId != userId }
     return ChatUiModel(
         id = id,
-        title = if (others.size > 1) {
+        title = if (otherParticipants.size > 1) {
             UiText.Resource(Res.string.group_chat)
         } else {
-            UiText.Dynamic(others.first().username)
+            UiText.Dynamic(otherParticipants.first().username)
         },
-        subtitle = others.takeIf { it.size > 1 }?.let { others ->
+        subtitle = otherParticipants.takeIf { it.size > 1 }?.let { others ->
             UiText.Combined(
                 listOf(
                     UiText.Resource(Res.string.you),
-                    UiText.Dynamic(others.joinToString(", ") { it.username })
+                    UiText.Dynamic(others.joinToString { it.username })
                 )
             )
         },
-        avatars = others.map {
+        avatars = otherParticipants.take(2).map {
             AvatarUiModel(
                 displayText = it.initials,
                 imageUrl = it.profilePictureUrl,
             )
         },
+        remainingAvatars = (otherParticipants.size - 2).coerceAtLeast(0),
         lastMessage = lastMessage?.let { lastMessage ->
             participants.find { it.userId == lastMessage.senderId }?.let { sender ->
                 buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("$sender:")
+                        append("${sender.username}:")
                     }
                     append(lastMessage.content)
                 }

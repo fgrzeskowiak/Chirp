@@ -4,5 +4,5 @@ import com.filippo.chat.domain.models.ChatParticipant
 import com.filippo.core.domain.RemoteResult
 
 interface ChatParticipantsRepository {
-    suspend fun searchParticipant(query: String): RemoteResult<ChatParticipant>
+    suspend fun search(username: String): RemoteResult<ChatParticipant>
 }

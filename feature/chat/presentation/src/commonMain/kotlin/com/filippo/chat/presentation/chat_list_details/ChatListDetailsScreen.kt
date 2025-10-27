@@ -18,13 +18,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.filippo.chat.presentation.chat_list_details.ChatListDetailsState.DialogState
 import com.filippo.chat.presentation.chat_list_details.details.ChatDetailsScreenRoot
 import com.filippo.chat.presentation.chat_list_details.list.ChatListScreenRoot
-import com.filippo.chat.presentation.create_chat.CreateChatScreenRoot
+import com.filippo.chat.presentation.manage_chat.CreateChatScreenRoot
+import com.filippo.chat.presentation.manage_chat.ManageChatScreenRoot
 import com.filippo.core.designsystem.theme.ChirpTheme
 import com.filippo.core.designsystem.theme.extended
 import com.filippo.core.presentation.util.DialogSheetScopedViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ChatListDetailsScreenRoot(
@@ -83,6 +85,7 @@ fun ChatListDetailsScreen(
                 ChatDetailsScreenRoot(
                     chatId = state.selectedChatId,
                     showBackButton = listPane == PaneAdaptedValue.Hidden && detailsPane == PaneAdaptedValue.Expanded,
+                    onChatMembersClick = { onAction(ChatListDetailsAction.OnManageChatClick) },
                     onBackClick = {
                         onAction(ChatListDetailsAction.OnChatClick(null))
                         scope.launch { scaffoldNavigator.navigateBack() }
@@ -96,14 +99,24 @@ fun ChatListDetailsScreen(
         isVisible = state.dialogState is DialogState.CreateChat
     ) {
         CreateChatScreenRoot(
-            onChatCreated = {
+            onChatCreated = { chatId ->
                 onAction(ChatListDetailsAction.OnDismissCurrentDialog)
-                onAction(ChatListDetailsAction.OnChatClick(it.id))
+                onAction(ChatListDetailsAction.OnChatClick(chatId))
                 scope.launch {
                     scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
                 }
             },
             onDismiss = { onAction(ChatListDetailsAction.OnDismissCurrentDialog) }
+        )
+    }
+
+    DialogSheetScopedViewModel(
+        isVisible = state.dialogState is DialogState.ManageChat
+    ) {
+        ManageChatScreenRoot(
+            viewModel = koinViewModel { parametersOf(state.selectedChatId) },
+            onMembersAdded = { onAction(ChatListDetailsAction.OnDismissCurrentDialog) },
+            onDismiss = { onAction(ChatListDetailsAction.OnDismissCurrentDialog) },
         )
     }
 }

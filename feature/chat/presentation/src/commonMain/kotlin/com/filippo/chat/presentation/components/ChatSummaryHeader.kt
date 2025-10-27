@@ -31,7 +31,7 @@ fun ChatSummary(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        ChirpStackedAvatars(avatars = chat.avatars)
+        ChirpStackedAvatars(avatars = chat.avatars, remaining = chat.remainingAvatars)
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -68,6 +68,7 @@ private fun ChatSummaryHeaderPreview() {
                 title = UiText.Dynamic("Group Chat"),
                 subtitle = UiText.Dynamic("Bolek i Lolek"),
                 avatars = listOf(AvatarUiModel("BO"), AvatarUiModel("LO")),
+                remainingAvatars = 2,
                 lastMessage = AnnotatedString("Last message"),
             )
         )

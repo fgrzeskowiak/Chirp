@@ -90,6 +90,7 @@ private fun ChatListItemUiPreview() {
                 ),
                 title = UiText.Dynamic("Group Chat"),
                 subtitle = UiText.Dynamic("You, Cinderella, Josh"),
+                remainingAvatars = 1,
                 lastMessage = AnnotatedString(
                     "Phillip: This is a last chat message that was sent by Philipp " +
                             "and goes over multiple lines to showcase the ellipsis",

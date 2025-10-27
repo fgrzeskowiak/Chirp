@@ -16,9 +16,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -38,6 +41,7 @@ import com.filippo.chat.presentation.components.ChatHeader
 import com.filippo.core.designsystem.components.avatar.AvatarUiModel
 import com.filippo.core.designsystem.theme.ChirpTheme
 import com.filippo.core.designsystem.theme.extended
+import com.filippo.core.presentation.util.ObserveAsEvents
 import com.filippo.core.presentation.util.UiText
 import com.filippo.core.presentation.util.clearFocusOnTap
 import com.filippo.core.presentation.util.currentDeviceConfiguration
@@ -48,18 +52,29 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatDetailsScreenRoot(
     chatId: String?,
     showBackButton: Boolean,
+    onChatMembersClick: () -> Unit,
     onBackClick: () -> Unit,
     viewModel: ChatDetailsViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarState = remember { SnackbarHostState() }
 
     LaunchedEffect(chatId) {
         viewModel.onChatSelected(chatId)
     }
 
+    ObserveAsEvents(viewModel.uiEvents) { event ->
+        when (event) {
+            ChatDetailsEvent.OnChatLeft -> onBackClick()
+            is ChatDetailsEvent.OnError -> snackbarState.showSnackbar(event.error.asStringAsync())
+        }
+    }
+
     ChatDetailsScreen(
         state = state,
+        snackbarState = snackbarState,
         showBackButton = showBackButton,
+        onChatMembersClick = onChatMembersClick,
         onBackClick = onBackClick,
         onAction = viewModel::onAction,
     )
@@ -68,8 +83,10 @@ fun ChatDetailsScreenRoot(
 @Composable
 fun ChatDetailsScreen(
     state: ChatDetailsState,
+    snackbarState: SnackbarHostState,
     showBackButton: Boolean,
     onAction: (ChatDetailsAction) -> Unit,
+    onChatMembersClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     val configuration = currentDeviceConfiguration()
@@ -82,6 +99,7 @@ fun ChatDetailsScreen(
         } else {
             MaterialTheme.colorScheme.extended.surfaceLower
         },
+        snackbarHost = { SnackbarHost(snackbarState) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -104,9 +122,8 @@ fun ChatDetailsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             chat = state.chat,
                             showBackButton = showBackButton,
-                            onChatOptionsClick = { onAction(ChatDetailsAction.OnChatOptionsClick) },
-                            onManageChatClick = { onAction(ChatDetailsAction.OnChatMembersClick) },
-                            onLeaveChatClick = { },
+                            onManageChatClick = onChatMembersClick,
+                            onLeaveChatClick = { onAction(ChatDetailsAction.OnLeaveChatClick) },
                             onBackClick = onBackClick
                         )
                     }
@@ -184,8 +201,10 @@ private fun ChatDetailEmptyPreview() {
     ChirpTheme {
         ChatDetailsScreen(
             state = ChatDetailsState(),
+            snackbarState = SnackbarHostState(),
             showBackButton = true,
             onAction = {},
+            onChatMembersClick = {},
             onBackClick = {},
         )
     }
@@ -204,6 +223,7 @@ private fun ChatDetailMessagesPreview() {
                     title = UiText.Dynamic("Group Chat"),
                     subtitle = UiText.Dynamic("You, Bolek, Lolek"),
                     avatars = listOf(AvatarUiModel("BO"), AvatarUiModel("LO")),
+                    remainingAvatars = 2,
                     lastMessage = AnnotatedString(
                         "This is a last chat message that was sent by Philipp " +
                                 "and goes over multiple lines to showcase the ellipsis"
@@ -231,8 +251,10 @@ private fun ChatDetailMessagesPreview() {
                     }
                 }
             ),
+            snackbarState = SnackbarHostState(),
             showBackButton = false,
             onAction = {},
+            onChatMembersClick = {},
             onBackClick = {},
         )
     }

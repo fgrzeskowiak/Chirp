@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.filippo.chat.presentation.chat_list_details.model.ChatParticipantUiModel
 import com.filippo.core.designsystem.components.avatar.ChirpAvatarPhoto
+import com.filippo.core.designsystem.components.brand.ChirpHorizontalDivider
 import com.filippo.core.designsystem.theme.extended
 import com.filippo.core.designsystem.theme.titleXSmall
 import com.filippo.core.presentation.util.DeviceConfiguration
@@ -28,6 +29,7 @@ import com.filippo.core.presentation.util.currentDeviceConfiguration
 @Composable
 fun ColumnScope.ChatParticipantsSelectionSection(
     participants: List<ChatParticipantUiModel>,
+    existingParticipants: List<ChatParticipantUiModel>,
     modifier: Modifier = Modifier,
     searchResult: ChatParticipantUiModel? = null,
 ) {
@@ -47,6 +49,19 @@ fun ColumnScope.ChatParticipantsSelectionSection(
 
     Box(modifier = rootHeightModifier.then(modifier)) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            items(
+                items = existingParticipants,
+                key = { "existing_${it.id}" }
+            ) { participant ->
+                ChatParticipantListItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    participant = participant
+                )
+            }
+
+            if (existingParticipants.isNotEmpty()) {
+                item { ChirpHorizontalDivider() }
+            }
             if (searchResult == null) {
                 items(
                     items = participants,
