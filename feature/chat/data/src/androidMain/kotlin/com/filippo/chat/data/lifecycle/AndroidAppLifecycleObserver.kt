@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 
 class AndroidAppLifecycleObserver : AppLifecycleObserver {
@@ -23,6 +22,5 @@ class AndroidAppLifecycleObserver : AppLifecycleObserver {
 
         lifecycle.addObserver(observer)
         awaitClose { lifecycle.removeObserver(observer) }
-    }.distinctUntilChanged()
-        .flowOn(Dispatchers.Main)
+    }.flowOn(Dispatchers.Main)
 }

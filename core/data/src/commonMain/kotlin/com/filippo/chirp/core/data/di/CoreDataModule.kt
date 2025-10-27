@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import okio.Path.Companion.toPath
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Configuration
+import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Named
 
@@ -27,4 +28,10 @@ class CoreDataModule {
 
     @Singleton
     fun httpClient(httpClientFactory: HttpClientFactory) = httpClientFactory.create()
+
+    @Factory
+    @Named(WEB_SOCKET_BASE_URL)
+    fun webSocketBaseUrl() = "wss://chirp.pl-coding.com/ws"
+
 }
+const val WEB_SOCKET_BASE_URL = "web_socket_base_url"

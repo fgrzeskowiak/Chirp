@@ -4,7 +4,6 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSNotificationName
 import platform.Foundation.NSOperationQueue
@@ -53,7 +52,7 @@ class IosAppLifecycleObserver: AppLifecycleObserver {
         awaitClose {
             observers.forEach(notificationCenter::removeObserver)
         }
-    }.distinctUntilChanged()
+    }
 
     private fun NSNotificationCenter.createObserver(
         name: NSNotificationName,

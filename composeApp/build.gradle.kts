@@ -18,7 +18,7 @@ kotlin {
         }
         commonMain {
             dependencies {
-                api(projects.core.data)
+                implementation(projects.core.data)
                 implementation(projects.core.domain)
                 implementation(projects.core.designsystem)
                 implementation(projects.core.presentation)

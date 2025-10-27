@@ -8,7 +8,6 @@ import androidx.core.content.getSystemService
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 internal class AndroidNetworkObserver(context: Context) : NetworkObserver {
     private val connectivityManager = checkNotNull(context.getSystemService<ConnectivityManager>())
@@ -48,5 +47,5 @@ internal class AndroidNetworkObserver(context: Context) : NetworkObserver {
 
         connectivityManager.registerDefaultNetworkCallback(networkCallback)
         awaitClose { connectivityManager.unregisterNetworkCallback(networkCallback) }
-    }.distinctUntilChanged()
+    }
 }
