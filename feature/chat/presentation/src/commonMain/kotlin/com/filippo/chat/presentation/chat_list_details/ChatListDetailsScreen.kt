@@ -9,6 +9,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -20,6 +21,8 @@ import com.filippo.chat.presentation.chat_list_details.details.ChatDetailsScreen
 import com.filippo.chat.presentation.chat_list_details.list.ChatListScreenRoot
 import com.filippo.chat.presentation.manage_chat.CreateChatScreenRoot
 import com.filippo.chat.presentation.manage_chat.ManageChatScreenRoot
+import com.filippo.chat.presentation.permissions.Permission
+import com.filippo.chat.presentation.permissions.rememberPermissionsController
 import com.filippo.core.designsystem.theme.ChirpTheme
 import com.filippo.core.designsystem.theme.extended
 import com.filippo.core.presentation.util.DialogSheetScopedViewModel
@@ -34,6 +37,10 @@ fun ChatListDetailsScreenRoot(
     onLogout: () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val permissionController = rememberPermissionsController()
+    LaunchedEffect(Unit) {
+        permissionController.requestPermissions(Permission.NOTIFICATIONS)
+    }
 
     ChatListDetailsScreen(
         state = state,

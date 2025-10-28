@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.convention.cmp.application)
     alias(libs.plugins.compose.hot.reload)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 kotlin {

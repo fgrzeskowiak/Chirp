@@ -8,7 +8,17 @@ kotlin {
     // Kotlin Gradle Plugin creates additional source sets that depend on each other, since it is
     // common to share sources between related targets.
     // See: https://kotlinlang.org/docs/multiplatform-hierarchy.html
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
+        val mobileMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.moko.permissions)
+                implementation(libs.moko.permissions.compose)
+                implementation(libs.moko.permissions.notifications)
+            }
+        }
         commonMain {
             dependencies {
                 implementation(projects.core.domain)
@@ -26,6 +36,7 @@ kotlin {
         }
 
         androidMain {
+            dependsOn(mobileMain)
             dependencies {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
@@ -34,6 +45,7 @@ kotlin {
         }
 
         iosMain {
+            dependsOn(mobileMain)
             dependencies {
                 // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
                 // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
